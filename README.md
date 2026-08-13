@@ -47,6 +47,25 @@ newsletter signup, both throttled; and the public *become a seller* form.
 Inactive products, brands and categories never appear on the storefront,
 whatever URL is guessed.
 
+**The home page.** A promotional carousel and the *Top rated* row, both fed
+from the seeded catalogue.
+
+![RMIT Store home page showing the Holiday specials carousel and the Top rated product row](screenshots/homepage.png)
+
+**The catalogue at `/shop`.** Filters down the left, 12 of 47 products per
+page. This one screen proves the whole chain is connected: the browser reached
+the SPA, the SPA reached the API, and the API reached the database.
+
+![The shop page with price, rating and category filters beside a grid of product cards](screenshots/shop-catalogue.png)
+
+**A product page.** Photography, live stock, the price and the star summary.
+
+![A product page showing the image, price, stock level and star rating](screenshots/product-page.png)
+
+Scroll down and the approved reviews and the star breakdown are underneath.
+
+![The review list and rating breakdown on a product page](screenshots/product-reviews.png)
+
 ### 👤 For members (shoppers)
 
 Register, sign in, edit a profile, change or reset a password, and manage
@@ -63,6 +82,36 @@ returns stock, product reviews and a wishlist. Line items snapshot the product's
 name, image and price, so history stays correct after a product is renamed,
 repriced or withdrawn.
 
+**Registering**, which is where journey B starts.
+
+![The registration form with name, email and password fields](screenshots/register.png)
+
+**Signing in.** A successful sign-in stores an access and a refresh token in
+the browser, which is why the session survives a reload.
+
+![The sign-in page with email and password fields](screenshots/login.png)
+
+**The bag.** Held in the browser, so it survives a reload and stays in step
+between tabs. The card form is underneath the running subtotal.
+
+![The bag drawer with two products, quantity steppers and a subtotal of $72.90](screenshots/cart-drawer.png)
+
+**The account dashboard.** Profile, security, addresses, orders and wishlist
+down the left.
+
+![The member account dashboard showing account details and the sidebar menu](screenshots/account-dashboard.png)
+
+**Order history**, and an order opened up. Note the arithmetic is worth
+checking by hand - 5% tax applies to the taxable line only.
+
+![The order history list showing one placed order](screenshots/order-history.png)
+
+![An order detail page showing subtotal $72.90, sales tax $2.25, total $75.15, Visa ending 4242 and a Paid badge](screenshots/order-detail.png)
+
+**The wishlist**, filled by the heart on any product card.
+
+![The wishlist panel in the account dashboard](screenshots/wishlist.png)
+
 ### 🧑‍🍳 For sellers (merchants)
 
 Apply through the public form. An administrator approves, which provisions the
@@ -74,6 +123,18 @@ returns `404` rather than `403`, and the endpoint cannot be used to probe for
 which ids exist. Deactivating a seller cascades to their brand and all of its
 products.
 
+**The public application form** at `/sell`.
+
+![The become a seller application form](screenshots/seller-application.png)
+
+**A seller's product list.** Two things to notice, because both are the
+authorisation model showing through the interface: the menu is shorter than an
+administrator's - no Users, Categories, Sellers or Reviews - and the list holds
+only the five Campus Threads products belonging to this seller, out of 47 in
+the store.
+
+![The seller dashboard listing only the five Campus Threads products, with a shorter sidebar menu](screenshots/merchant-products.png)
+
 ### 🛠️ For administrators
 
 Full CRUD over products, categories and brands; seller applications and
@@ -83,6 +144,25 @@ store, with line items movable along the fulfilment path. A product attached to
 a historical order cannot be deleted - the API says so and suggests
 deactivating it instead. Django's own admin at `/admin/` is there too, which is
 the quickest way to inspect a deployment without going through the SPA.
+
+**Catalogue management.** The full 47 products, with stock and status.
+
+![The administrator product list with stock levels, status badges and edit and delete actions](screenshots/admin-products.png)
+
+**Every order in the store**, with each line item movable along the fulfilment
+path.
+
+![The administrator order list showing orders across all customers](screenshots/admin-orders.png)
+
+**The review moderation queue.** Rejecting a review removes it from the product
+page *and* from the average.
+
+![The review moderation queue with approve and reject controls](screenshots/admin-review-moderation.png)
+
+**Seller applications and accounts**, where an application is approved and the
+invitation is sent.
+
+![The seller management screen listing applications and their approval status](screenshots/admin-sellers.png)
 
 ### 🔐 Security and correctness
 
@@ -477,6 +557,21 @@ Then open these in a browser:
   administrator account you just created. Useful for inspecting data during a
   deployment.
 
+This is `/api/docs/`. Every endpoint in the table above is here, and each one
+can be called from the browser with the **Try it out** button.
+
+![Swagger UI listing the RMIT Store API endpoints grouped by tag](screenshots/swagger-ui.png)
+
+This is `/admin/`. Sign in with the administrator account from Step 5.
+
+![The Django admin login form](screenshots/django-admin-login.png)
+
+![The Django admin index listing the accounts, catalog, merchants, orders and reviews apps](screenshots/django-admin.png)
+
+> If `/admin/` renders as unstyled black-on-white text, that is `collectstatic`
+> not having run. It does not matter yet under `runserver` with `dev` settings,
+> and it matters a great deal in **9.3**.
+
 This command holds the terminal open and does not return - that is your **first
 terminal**, and the API keeps running in it. Leave it alone and open a second
 one for the next step.
@@ -494,7 +589,15 @@ cp .env.example .env
 npm run dev
 ```
 
-Open <http://localhost:5173>.
+Open <http://localhost:5173>. If everything above worked, this is what you get
+- and the product photography loading is the proof that the API, the database
+and the seeded media are all reachable from the browser.
+
+![The RMIT Store home page running on localhost:5173](screenshots/homepage.png)
+
+If the page loads but every product is a grey placeholder box, the SPA is
+running and the API is not. Check the terminal from Step 6, then read
+"The frontend loads but every request fails" in Troubleshooting.
 
 The Vite dev server proxies `/api` and `/media` through to
 `http://localhost:8000`, so the browser sees a single origin and cross-origin
@@ -1101,10 +1204,22 @@ The card numbers are Stripe's, so they are probably the ones you already know:
 
 Any expiry date in the future and any security code of the right length will
 do. The card form in the bag keeps the common numbers behind a *use a test
-number* disclosure, so demonstrating a checkout needs no typing.
+number* disclosure, so demonstrating a checkout needs no typing - open it and
+click a number to fill the whole form.
+
+![The checkout card form with the use a test number disclosure expanded, showing the succeeds, declined and insufficient funds buttons](screenshots/checkout-card-form.png)
+
+Pay with `4000 0000 0000 0002` and you get this. **Look at what did not
+happen:** both items are still in the bag, and no stock has moved.
+
+![The bag after a declined payment, showing the Your card was declined message with both items still in the bag](screenshots/payment-declined.png)
 
 A declined card leaves no order behind and takes no stock, which makes the
 decline numbers a safe thing to try repeatedly while verifying a deployment.
+
+Pay again with `4242 4242 4242 4242` and the order is placed.
+
+![The order confirmation page shown after a successful payment](screenshots/order-confirmation.png)
 
 ## 📧 Email
 
@@ -1161,6 +1276,10 @@ converts into an end-to-end test.
 After every deployment, walk these. They are also your backlog for automated
 end-to-end tests.
 
+Every screen these journeys end on is pictured in the **Features** section
+above, so you can compare what you are looking at against what it should be.
+The screenshots live in [`screenshots/`](screenshots/).
+
 **A. Anonymous browsing.** Home → Shop shows 12 of 47 products → narrow the
 price range and watch the count drop → choose "4 ★ & up" → sort by price,
 high to low, and check it is actually descending → page 2 shows different
@@ -1174,6 +1293,12 @@ has your items in it, and no stock has moved** → pay again with
 the arithmetic by hand**: 5% tax on the taxable line only → confirm the summary
 shows *Visa ending 4242* and *Paid* → confirm in `/admin/` that stock went down
 by exactly the right amount, once.
+
+A finished journey B looks like this. One taxable line at `$44.95` and one
+non-taxable at `$27.95`: subtotal `$72.90`, tax `$2.25` - five per cent of the
+t-shirt alone, not of the subtotal - and a total of `$75.15`.
+
+![An order detail page showing subtotal $72.90, sales tax $2.25, total $75.15, Visa ending 4242 and a Paid badge](screenshots/order-detail.png)
 
 **C. Fulfilment.** As an administrator, mark an item *Shipped* → the customer
 sees it. As the customer, cancel the other item → its stock comes back and the
