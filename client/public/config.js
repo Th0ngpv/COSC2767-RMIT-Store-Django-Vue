@@ -33,5 +33,5 @@
 
 window.__APP_CONFIG__ = {
   // Where the API lives, as seen by the *browser*, not by the server.
-  API_BASE_URL: '/api'
+  API_BASE_URL: 'http://44.209.143.71:8000/api'
 }
