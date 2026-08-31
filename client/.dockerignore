@@ -1,0 +1,15 @@
+# Dependencies are installed inside the image
+node_modules
+
+# Existing build output
+dist
+
+# Git files
+.git
+.gitignore
+
+# Environment files
+.env
+
+# Logs
+*.log
