@@ -1,0 +1,19 @@
+# Virtual environment
+.venv
+
+# Python cache
+__pycache__
+*.pyc
+
+# Git files
+.git
+.gitignore
+
+# Environment secrets
+.env
+
+# Local media
+media
+
+# Logs
+*.log
